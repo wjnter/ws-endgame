@@ -26,22 +26,10 @@ export const createDocs = (message, createDoc) => {
 export const getDocs = async ( regExpTime, model ) => await model.find({ time: regExpTime });
 
 export const CONSTANT_TYPE = [
-  {
-    type: "flame",
-    model: Flame 
-  },
-  {
-    type: "gas",
-    model: Gas 
-  },
-  {
-    type: "humidity",
-    model: Humidity
-  },
-  {
-    type: "temperature",
-    model: Temperature
-  }
+  { type: "flame",       model: Flame },
+  { type: "gas",         model: Gas },
+  { type: "humidity",    model: Humidity },
+  { type: "temperature", model: Temperature }
 ];
 
 export function IsJsonString(str) {
@@ -86,6 +74,7 @@ export const getCurrentDate = _ => {
 export const getCurrentTime = _ => {
   const currentTime = new Date();
   const hour = currentTime.getHours();
-	const min = currentTime.getMinutes();
+  const min = currentTime.getMinutes();
+  
 	return `${hour < 10 ? '0' + hour : hour}:${min < 10 ? '0' + min : min}`;
 }
