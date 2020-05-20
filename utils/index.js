@@ -23,7 +23,7 @@ export const createDocs = (message, createDoc) => {
   docs.map(createDoc);
 }
 
-export const getDocs = async (type, model) => await model.find({ type });
+export const getDocs = async ( regExpTime, model ) => await model.find({ time: regExpTime });
 
 export const CONSTANT_TYPE = [
   {
@@ -56,18 +56,36 @@ export function IsJsonString(str) {
 export const clearAllDocs = async message => {
   // const broadcastRegex = /^delete/;
   if (message.includes('delete')) {
-    const date = "Apr 27 2020";
+    const date = "May 05 2020";
     await Flame.deleteMany({date});
     await Gas.deleteMany({date});
     await Humidity.deleteMany({date});
     await Temperature.deleteMany({date});
   }
-  // if (broadcastRegex.test(message)) {
-  //   const date = "Apr 27 2020";
-  //   await Flame.deleteMany({date});
-  //   await Gas.deleteMany({date});
-  //   await Humidity.deleteMany({date});
-  //   await Temperature.deleteMany({date});
-  // }
 }
 
+export const clearAllDocsWithDate = async date => {
+  // const broadcastRegex = /^delete/;
+    await Flame.deleteMany({date});
+    await Gas.deleteMany({date});
+    await Humidity.deleteMany({date});
+    await Temperature.deleteMany({date});
+}
+
+
+export const getCurrentDate = _ => {
+  const fullDate = new Date();
+  const CONSTANT_MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const year = fullDate.getFullYear();
+  const month = fullDate.getMonth();
+  const date = fullDate.getDate();
+
+  return `${CONSTANT_MONTH[month]} ${date} ${year}`;
+}
+
+export const getCurrentTime = _ => {
+  const currentTime = new Date();
+  const hour = currentTime.getHours();
+	const min = currentTime.getMinutes();
+	return `${hour < 10 ? '0' + hour : hour}:${min < 10 ? '0' + min : min}`;
+}

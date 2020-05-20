@@ -48,9 +48,9 @@ var wss = new WebSocket.Server({ server: server });
 
 //when browser sends get request, send html file to browser
 // viewed at http://localhost:3300
-app.get("/", function (req, res) {
-	res.sendFile(path.join(__dirname + "/index.html"));
-});
+// app.get("/", (req, res) => {
+// 	res.sendFile(path.join(__dirname + "/index.html"));
+// });
 
 /*-------------------------------ws chat server----------------------------------*/
 
@@ -64,12 +64,22 @@ wss.on("connection", async function (ws, req) {
 	try {
 		for (var _iterator = _index.CONSTANT_TYPE[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 			var item = _step.value;
-			var type = item.type,
-			    model = item.model;
+			var model = item.model;
+			// Get current hour and min to generate regexp to query
 
-			var doc = await (0, _index.getDocs)(type, model);
+			var hour = new Date().getHours();
+			var min = new Date().getMinutes();
+			var regExpTimeGet = new RegExp(hour + ":" + min, "i");
+			var currentFullDate = (0, _index.getCurrentDate)();
+			console.log("::::::currentFullDate", currentFullDate);
+
+			var regExpTimeDelete = new RegExp();
+			// Get all docs at current time within a min
+			var doc = await (0, _index.getDocs)(regExpTimeGet, model);
 			dataset.push(doc.slice(-1)[0]);
 		}
+
+		// Send the last document to the client that has been connected
 	} catch (err) {
 		_didIteratorError = true;
 		_iteratorError = err;
@@ -85,8 +95,6 @@ wss.on("connection", async function (ws, req) {
 		}
 	}
 
-	console.log(":dataset", dataset);
-	// Send the last document to the client that has been connected
 	ws.send(JSON.stringify(dataset));
 
 	/******* when server receives messsage from client trigger function with argument message *****/

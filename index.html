@@ -36,7 +36,6 @@
 			var display = document.getElementById("display");
 
 			sock.onopen = function (event) {
-				//alert("Socket connected succesfully!!!")
 				setTimeout(function () {
 					sock.send("connection succeeded");
 				}, 1000);

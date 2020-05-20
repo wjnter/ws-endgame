@@ -19,7 +19,9 @@ import {
 	IsJsonString, 
 	clearAllDocs, 
 	getDocs,
-	CONSTANT_TYPE
+	CONSTANT_TYPE,
+	getCurrentDate,
+	getCurrentTime
 } 
 from "./utils/index";
 
@@ -45,22 +47,37 @@ const wss = new WebSocket.Server({ server });
 
 //when browser sends get request, send html file to browser
 // viewed at http://localhost:3300
-app.get("/", (req, res) => {
-	res.sendFile(path.join(__dirname + "/index.html"));
-});
+// app.get("/", (req, res) => {
+// 	res.sendFile(path.join(__dirname + "/index.html"));
+// });
 
 /*-------------------------------ws chat server----------------------------------*/
 
 //app.ws('/echo', function(ws, req) {
 wss.on("connection", async (ws, req) => {
-	let dataset = [];
+	const dataset = [];
+	let currentFullDate = "";
+	// Get current hour and min to generate regexp to query
+	const fullDateNow = getCurrentDate();
+	const timeNow = getCurrentTime();
+	const isNewDate = currentFullDate !== fullDateNow;
+
+	if (isNewDate) {
+		// Clear all docs of the previous day 
+		await clearAllDocsWithDate(currentFullDate);
+		currentFullDate = fullDateNow;
+	}
+
+	const regExpTimeGet = new RegExp(timeNow, 'i');
+
+	//use for..of bcuz map or forEach cannot do async
 	for (const item of CONSTANT_TYPE) {
-		const { type, model } = item;
-		const doc = await getDocs(type, model);
+		const { model } = item;
+		// Get all docs at current time within a min
+		const doc = await getDocs(regExpTimeGet, model);
 		dataset.push(doc.slice(-1)[0]);
 	}
 
-	console.log(":dataset", dataset);
 	// Send the last document to the client that has been connected
 	ws.send(JSON.stringify(dataset));
 

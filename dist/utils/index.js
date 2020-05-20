@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clearAllDocs = exports.CONSTANT_TYPE = exports.getDocs = exports.createDocs = exports.createDoc = undefined;
+exports.getCurrentDate = exports.clearAllDocs = exports.CONSTANT_TYPE = exports.getDocs = exports.createDocs = exports.createDoc = undefined;
 exports.IsJsonString = IsJsonString;
 
 var _flames = require("../models/flames.model");
@@ -63,8 +63,8 @@ var createDocs = exports.createDocs = function createDocs(message, createDoc) {
   docs.map(createDoc);
 };
 
-var getDocs = exports.getDocs = async function getDocs(type, model) {
-  return await model.find({ type: type });
+var getDocs = exports.getDocs = async function getDocs(regExpTime, model) {
+  return await model.find({ time: regExpTime });
 };
 
 var CONSTANT_TYPE = exports.CONSTANT_TYPE = [{
@@ -93,17 +93,20 @@ function IsJsonString(str) {
 var clearAllDocs = exports.clearAllDocs = async function clearAllDocs(message) {
   // const broadcastRegex = /^delete/;
   if (message.includes('delete')) {
-    var date = "Apr 27 2020";
+    var date = "May 05 2020";
     await _flames2.default.deleteMany({ date: date });
     await _gases2.default.deleteMany({ date: date });
     await _humidities2.default.deleteMany({ date: date });
     await _temperatures2.default.deleteMany({ date: date });
   }
-  // if (broadcastRegex.test(message)) {
-  //   const date = "Apr 27 2020";
-  //   await Flame.deleteMany({date});
-  //   await Gas.deleteMany({date});
-  //   await Humidity.deleteMany({date});
-  //   await Temperature.deleteMany({date});
-  // }
+};
+
+var getCurrentDate = exports.getCurrentDate = function getCurrentDate() {
+  var fullDate = new Date();
+  var CONSTANT_MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var year = fullDate.getFullYear();
+  var month = fullDate.getMonth();
+  var date = fullDate.getDate();
+
+  return CONSTANT_MONTH[month] + " " + date + " " + year;
 };
