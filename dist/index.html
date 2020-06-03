@@ -18,6 +18,7 @@
 		</button>
 
 		<button onclick="clearlog()">Clear Logs</button>
+		<button onclick="stopSending()">Stop</button>
 
 		<div
 			style="
@@ -32,11 +33,11 @@
 
 		<script>
 			//var sock =new WebSocket("ws://localhost:5001");
-			var sock = new WebSocket("ws://localhost:3300/"); //replace this address with the one the node.js server prints out. keep port 3000
+			var sock = new WebSocket("ws://localhost:3300"); //replace this address with the one the node.js server prints out. keep port 3000
 			var display = document.getElementById("display");
+			let idInterval = 0;
 
 			sock.onopen = function (event) {
-				//alert("Socket connected succesfully!!!")
 				setTimeout(function () {
 					sock.send("connection succeeded");
 				}, 1000);
@@ -64,24 +65,27 @@
 				}
 			}
 			const randomData = () => {
-				const randomValueFlame = Math.floor((Math.random() * 5) + 40);
-				const randomValueGas = Math.floor((Math.random() * 5) + 20);
-				const randomValueTemperature = Math.floor((Math.random() * 15) + 20);
-				const randomValueHumidity = Math.floor((Math.random() * 10) + 70);
-				const date = (new Date()).toString().split(" ");
+				const randomValueFlame = Math.floor(Math.random() * 5 + 40);
+				const randomValueGas = Math.floor(Math.random() * 5 + 20);
+				const randomValueTemperature = Math.floor(Math.random() * 15 + 20);
+				const randomValueHumidity = Math.floor(Math.random() * 10 + 70);
+				const date = new Date().toString().split(" ");
 				const currentDate = date.slice(1, 4).join(" ");
 				const currentTime = date[4];
 				return `[
-					{"type": "flame", "value": "${randomValueFlame}", "date": "${currentDate}", "time": "${currentTime}"},
 					{"type": "gas", "value": "${randomValueGas}", "date": "${currentDate}", "time": "${currentTime}"},
-					{"type": "humidity", "value": "${randomValueTemperature}", "date": "${currentDate}", "time": "${currentTime}"},
 					{"type": "temperature", "value": "${randomValueHumidity}", "date": "${currentDate}", "time": "${currentTime}"}
-				]`
-			}
+				]`;
+			};
 
 			function sendData() {
-				const data = randomData();
-				sock.send(data); //send string to server
+				idInterval = setInterval(() => {
+					const data = randomData();
+					sock.send(data); //send string to server
+				}, 5000);
+			}
+			function stopSending() {
+				clearInterval(idInterval);
 			}
 
 			function clearlog() {
