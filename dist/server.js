@@ -134,7 +134,7 @@ wss.on("connection", async function (ws, req) {
 								return acc + +curr.value;
 							}, 0) / doc.length;
 							newAvgDocs.type = "avg" + newAvgDocs.type[0].toUpperCase() + newAvgDocs.type.slice(1);
-							newAvgDocs.value = "" + avgValue.toFixed(2);
+							newAvgDocs.value = "" + Math.round(avgValue);
 							dataOfPreviousDate.push(newAvgDocs);
 						}
 					}
@@ -197,7 +197,7 @@ wss.on("connection", async function (ws, req) {
 				}
 			}
 
-			ws.send(JSON.stringify(avgDailyDataset));
+			ws.send(JSON.stringify(["getAvgData", avgDailyDataset]));
 			avgDailyDataset.length = 0;
 		}
 

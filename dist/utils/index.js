@@ -109,7 +109,7 @@ function IsJsonString(str) {
 var clearAllDocs = exports.clearAllDocs = async function clearAllDocs(message) {
 	// const broadcastRegex = /^delete/;
 	if (message.includes("delete")) {
-		var date = "May 27 2020";
+		var date = "May 30 2020";
 		await _gases2.default.deleteMany({ date: date });
 		await _temperatures2.default.deleteMany({ date: date });
 		// await Flame.deleteMany({date});

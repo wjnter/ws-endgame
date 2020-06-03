@@ -34,8 +34,7 @@ export const getDocsWithDate = async (date, model) =>
 	await model.find({ date });
 export const getDocsWithTime = async (time, model) =>
 	await model.find({ time });
-export const getAllDocs = async model =>
-	await model.find({ });
+export const getAllDocs = async (model) => await model.find({});
 
 export const CONSTANT_TYPE = [
 	{ type: "temperature", model: Temperature },
@@ -68,7 +67,7 @@ export function IsJsonString(str) {
 export const clearAllDocs = async (message) => {
 	// const broadcastRegex = /^delete/;
 	if (message.includes("delete")) {
-		const date = "May 27 2020";
+		const date = "May 30 2020";
 		await Gas.deleteMany({ date });
 		await Temperature.deleteMany({ date });
 		// await Flame.deleteMany({date});
