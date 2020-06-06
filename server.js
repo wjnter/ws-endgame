@@ -3,7 +3,7 @@
 var bodyParser = require("body-parser");
 const express = require("express"); //express framework to have a higher level of methods
 const app = express(); //assign app variable the express class/method
-var http = require("http");
+// var http = require("http");
 var path = require("path");
 var jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -35,7 +35,7 @@ mongoose
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const server = http.createServer(app); //create a server
+// const server = http.createServer(app); //create a server
 
 //***************this snippet gets the local ip of the node.js server. copy this ip to the client side code and add ':3000' *****
 //****************exmpl. 192.168.56.1---> var sock =new WebSocket("ws://192.168.56.1:3000");*************************************
@@ -45,6 +45,8 @@ require("dns").lookup(require("os").hostname(), function (err, add, fam) {
 
 /*-------------------------------websocket setup----------------------------------*/
 //var expressWs = require('express-ws')(app,server);
+const https = require("https");
+const server = https.createServer(app);
 const WebSocketServer = require("ws").Server;
 const wss = new WebSocketServer({ server });
 
