@@ -24,7 +24,28 @@ var path = require("path");
 var jwt = require("jsonwebtoken");
 var mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost/end-game");
+/**
+ * !: %21
+ * @: %40
+ * #: %23
+ */
+var uri = "mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
+var options = {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false,
+	autoIndex: false, // Don't build indexes
+	poolSize: 10, // Maintain up to 10 socket connections
+	serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+	socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+	family: 4 // Use IPv4, skip trying IPv6
+};
+
+mongoose.connect(uri).catch(function (err) {
+	return console.log("err here::::", err);
+});
+// mongoose.connect("mongodb://localhost/end-game");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

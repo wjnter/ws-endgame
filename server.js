@@ -22,11 +22,16 @@ import {
 	getCurrentDate,
 	getCurrentTime,
 	clearAllDocsWithDate,
-	CONSTANT_TYPE_AVG,
 	getAllDocs,
-} from "./utils/index";
+} from "./utils";
 
-mongoose.connect("mongodb://localhost/end-game");
+// const uri =
+// 	"mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
+const uri = "mongodb://localhost/end-game";
+
+mongoose
+	.connect(process.env.MONGODB_URI || uri)
+	.catch((err) => console.log("err here::::", err));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -145,4 +150,4 @@ wss.on("connection", async (ws, req) => {
 	});
 });
 
-server.listen(3300);
+server.listen(process.env.PORT || 3300);
