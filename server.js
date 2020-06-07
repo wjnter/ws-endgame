@@ -28,6 +28,7 @@ import {
 // const uri =
 // 	"mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
 const uri = "mongodb://localhost/end-game";
+const port = process.env.PORT || 3300;
 
 mongoose
 	.connect(process.env.MONGODB_URI || uri)
@@ -150,4 +151,6 @@ wss.on("connection", async (ws, req) => {
 	});
 });
 
-server.listen(process.env.PORT || 3300);
+server.listen(port, () => {
+	console.log("Listening at port: ", port);
+});
