@@ -8,7 +8,7 @@ var _avgGases = require("./models/avgGases.model");
 
 var _avgGases2 = _interopRequireDefault(_avgGases);
 
-var _index = require("./utils/index");
+var _utils = require("./utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,28 +24,19 @@ var path = require("path");
 var jwt = require("jsonwebtoken");
 var mongoose = require("mongoose");
 
-/**
- * !: %21
- * @: %40
- * #: %23
- */
-var uri = "mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
-var options = {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	useCreateIndex: true,
-	useFindAndModify: false,
-	autoIndex: false, // Don't build indexes
-	poolSize: 10, // Maintain up to 10 socket connections
-	serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-	socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-	family: 4 // Use IPv4, skip trying IPv6
-};
+var _require = require("awake-heroku"),
+    AwakeHeroku = _require.AwakeHeroku;
 
-mongoose.connect(uri).catch(function (err) {
+// const uri =
+// 	"mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
+var uri = "mongodb://localhost/end-game";
+var port = process.env.PORT || 3300;
+
+AwakeHeroku.add({ url: "https://ute-endgame.herokuapp.com/" });
+
+mongoose.connect(process.env.MONGODB_URI || uri).catch(function (err) {
 	return console.log("err here::::", err);
 });
-// mongoose.connect("mongodb://localhost/end-game");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -77,7 +68,7 @@ app.get("/", function (req, res) {
 //app.ws('/echo', function(ws, req) {
 wss.on("connection", async function (ws, req) {
 	var dataset = [];
-	var timeNow = (0, _index.getCurrentTime)();
+	var timeNow = (0, _utils.getCurrentTime)();
 	var currentFullDate = "";
 	// RegExp time to query docs
 	var regExpTime = new RegExp(timeNow, "i");
@@ -88,14 +79,14 @@ wss.on("connection", async function (ws, req) {
 	var _iteratorError = undefined;
 
 	try {
-		for (var _iterator = _index.CONSTANT_TYPE[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+		for (var _iterator = _utils.CONSTANT_TYPE[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 			var item = _step.value;
 			var type = item.type,
 			    model = item.model;
 			// Get all docs at current time within a min
 
 			if (!type.includes("avgTemperature") && !type.includes("avgGas")) {
-				var doc = await (0, _index.getDocsWithTime)(regExpTime, model);
+				var doc = await (0, _utils.getDocsWithTime)(regExpTime, model);
 				dataset.push(doc.slice(-1)[0]);
 			}
 		}
@@ -123,7 +114,7 @@ wss.on("connection", async function (ws, req) {
 		// Get current hour and min to generate regexp to query
 		var avgDailyDataset = [];
 		// const fullDateNow = "May 31 2020";
-		var fullDateNow = (0, _index.getCurrentDate)();
+		var fullDateNow = (0, _utils.getCurrentDate)();
 		var isNewDate = currentFullDate !== fullDateNow;
 
 		if (isNewDate && currentFullDate !== "") {
@@ -133,7 +124,7 @@ wss.on("connection", async function (ws, req) {
 			var _iteratorError2 = undefined;
 
 			try {
-				for (var _iterator2 = _index.CONSTANT_TYPE[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+				for (var _iterator2 = _utils.CONSTANT_TYPE[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 					var item = _step2.value;
 					var type = item.type,
 					    model = item.model;
@@ -141,7 +132,7 @@ wss.on("connection", async function (ws, req) {
 					var doc = void 0;
 					// Get all docs at the previous day
 					if (!type.includes("avgTemperature") && !type.includes("avgGas")) {
-						doc = await (0, _index.getDocsWithDate)(currentFullDate, model);
+						doc = await (0, _utils.getDocsWithDate)(currentFullDate, model);
 						if (doc.length) {
 							var _doc$ = doc[1],
 							    _type = _doc$.type,
@@ -175,17 +166,17 @@ wss.on("connection", async function (ws, req) {
 				}
 			}
 
-			await (0, _index.createDocs)(JSON.stringify(dataOfPreviousDate), _index.createDoc);
+			await (0, _utils.createDocs)(JSON.stringify(dataOfPreviousDate), _utils.createDoc);
 			dataOfPreviousDate.length = 0;
 			// Clear all docs of the previous day
-			await (0, _index.clearAllDocsWithDate)(currentFullDate);
+			await (0, _utils.clearAllDocsWithDate)(currentFullDate);
 
 			currentFullDate = fullDateNow;
 		}
 
-		var isJson = (0, _index.IsJsonString)(message);
+		var isJson = (0, _utils.IsJsonString)(message);
 
-		isJson ? (0, _index.createDocs)(message, _index.createDoc) : await (0, _index.clearAllDocs)(message);
+		isJson ? (0, _utils.createDocs)(message, _utils.createDoc) : await (0, _utils.clearAllDocs)(message);
 
 		if (message === "getAvgData") {
 			var _iteratorNormalCompletion3 = true;
@@ -193,13 +184,13 @@ wss.on("connection", async function (ws, req) {
 			var _iteratorError3 = undefined;
 
 			try {
-				for (var _iterator3 = _index.CONSTANT_TYPE[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+				for (var _iterator3 = _utils.CONSTANT_TYPE[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 					var _item = _step3.value;
 					var type = _item.type,
 					    model = _item.model;
 
 					if (type.includes("avgTemperature") && model === _avgTemperatures2.default || type.includes("avgGas") && model === _avgGases2.default) {
-						var avgDoc = await (0, _index.getAllDocs)(model);
+						var avgDoc = await (0, _utils.getAllDocs)(model);
 						avgDailyDataset.push.apply(avgDailyDataset, _toConsumableArray(avgDoc));
 					}
 				}
@@ -233,4 +224,6 @@ wss.on("connection", async function (ws, req) {
 	});
 });
 
-server.listen(3300);
+server.listen(port, function () {
+	console.log("Listening at port: ", port);
+});

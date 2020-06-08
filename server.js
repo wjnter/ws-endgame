@@ -7,7 +7,7 @@ var http = require("http");
 var path = require("path");
 var jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const { AwakeService } = require("awake-heroku");
+const { AwakeHeroku } = require("awake-heroku");
 
 import AvgTemperatures from "./models/avgTemperatures.model";
 import AvgGases from "./models/avgGases.model";
@@ -31,7 +31,7 @@ import {
 const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
-AwakeService.add({ url: "https://ute-endgame.herokuapp.com/" });
+AwakeHeroku.add({ url: "https://ute-endgame.herokuapp.com/" });
 
 mongoose
 	.connect(process.env.MONGODB_URI || uri)
