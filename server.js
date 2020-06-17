@@ -4,10 +4,7 @@ var bodyParser = require("body-parser");
 const express = require("express"); //express framework to have a higher level of methods
 const app = express(); //assign app variable the express class/method
 var http = require("http");
-var path = require("path");
-var jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const { AwakeHeroku } = require("awake-heroku");
 
 import AvgTemperatures from "./models/avgTemperatures.model";
 import AvgGases from "./models/avgGases.model";
@@ -26,12 +23,13 @@ import {
 	getAllDocs,
 } from "./utils";
 
-// const uri =
-// 	"mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
-const uri = "mongodb://localhost/end-game";
-const port = process.env.PORT || 3300;
+const userName = "tptdong97";
+const password = "admin";
+const dbName = "endgame_ute";
 
-AwakeHeroku.add({ url: "https://ute-endgame.herokuapp.com/" });
+const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+// const uri = "mongodb://localhost/end-game";
+const port = process.env.PORT || 3300;
 
 mongoose
 	.connect(process.env.MONGODB_URI || uri)
@@ -56,15 +54,8 @@ app.get("/", (req, res) => {
 	res.send("hello");
 });
 
-// when browser sends get request, send html file to browser
-// viewed at http://localhost:3300
-// app.get("/", (req, res) => {
-// 	res.sendFile(path.join(__dirname + "/index.html"));
-// });
-
 /*-------------------------------ws chat server----------------------------------*/
 
-//app.ws('/echo', function(ws, req) {
 wss.on("connection", async (ws, req) => {
 	const dataset = [];
 	const timeNow = getCurrentTime();
