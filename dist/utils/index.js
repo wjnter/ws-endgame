@@ -3,16 +3,8 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getCurrentTime = exports.getCurrentDate = exports.clearAllDocsWithDate = exports.clearAllDocs = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
+exports.getAvgValue = exports.getCurrentTime = exports.getCurrentDate = exports.clearAllDocsWithDate = exports.clearAllDocs = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
 exports.IsJsonString = IsJsonString;
-
-var _flames = require("../models/flames.model");
-
-var _flames2 = _interopRequireDefault(_flames);
-
-var _humidities = require("../models/humidities.model");
-
-var _humidities2 = _interopRequireDefault(_humidities);
 
 var _gases = require("../models/gases.model");
 
@@ -35,34 +27,62 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var handleGetType = async function handleGetType(_ref) {
 	var typeName = _ref.typeName,
 	    type = _ref.type,
-	    value = _ref.value,
+	    valueNode1 = _ref.valueNode1,
+	    valueNode2 = _ref.valueNode2,
 	    date = _ref.date,
 	    time = _ref.time;
 
-	var docsType = new typeName({ type: type, value: value, date: date, time: time });
+	var docsType = new typeName({ type: type, valueNode1: valueNode1, valueNode2: valueNode2, date: date, time: time });
 	await docsType.save();
 };
 
 var createDoc = exports.createDoc = async function createDoc(_ref2) {
 	var type = _ref2.type,
-	    value = _ref2.value,
+	    valueNode1 = _ref2.valueNode1,
+	    valueNode2 = _ref2.valueNode2,
 	    date = _ref2.date,
 	    time = _ref2.time;
 
 	var getTypes = {
-		// "flame": () =>  handleGetType({typeName: Flame, type, value, date, time}),
-		// "humidity": () => handleGetType({typeName: Humidity, type, value, date, time}),
 		gas: function gas() {
-			return handleGetType({ typeName: _gases2.default, type: type, value: value, date: date, time: time });
+			return handleGetType({
+				typeName: _gases2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
 		},
 		temperature: function temperature() {
-			return handleGetType({ typeName: _temperatures2.default, type: type, value: value, date: date, time: time });
+			return handleGetType({
+				typeName: _temperatures2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
 		},
 		avgGas: function avgGas() {
-			return handleGetType({ typeName: _avgGases2.default, type: type, value: value, date: date, time: time });
+			return handleGetType({
+				typeName: _avgGases2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
 		},
 		avgTemperature: function avgTemperature() {
-			return handleGetType({ typeName: _avgTemperatures2.default, type: type, value: value, date: date, time: time });
+			return handleGetType({
+				typeName: _avgTemperatures2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
 		}
 	};
 	getTypes[type]();
@@ -85,18 +105,6 @@ var getAllDocs = exports.getAllDocs = async function getAllDocs(model) {
 
 var CONSTANT_TYPE = exports.CONSTANT_TYPE = [{ type: "temperature", model: _temperatures2.default }, { type: "gas", model: _gases2.default }, { type: "avgTemperature", model: _avgTemperatures2.default }, { type: "avgGas", model: _avgGases2.default }];
 
-// export const CONSTANT_TYPE_AVG = [
-// 	{ type: "avgTemperature", model: AvgTemperatures },
-// 	{ type: "avgGas", model: AvgGases },
-// ];
-
-// export const CONSTANT_TYPE = [
-//   { type: "flame",       model: Flame },
-//   { type: "gas",         model: Gas },
-//   { type: "humidity",    model: Humidity },
-//   { type: "temperature", model: Temperature }
-// ];
-
 function IsJsonString(str) {
 	try {
 		JSON.parse(str);
@@ -106,23 +114,14 @@ function IsJsonString(str) {
 	return true;
 }
 
-var clearAllDocs = exports.clearAllDocs = async function clearAllDocs(message) {
-	// const broadcastRegex = /^delete/;
-	if (message.includes("delete")) {
-		var date = "May 30 2020";
-		await _gases2.default.deleteMany({ date: date });
-		await _temperatures2.default.deleteMany({ date: date });
-		// await Flame.deleteMany({date});
-		// await Humidity.deleteMany({date});
-	}
+var clearAllDocs = exports.clearAllDocs = async function clearAllDocs(date) {
+	await _gases2.default.deleteMany({ date: date });
+	await _temperatures2.default.deleteMany({ date: date });
 };
 
 var clearAllDocsWithDate = exports.clearAllDocsWithDate = async function clearAllDocsWithDate(date) {
 	await _gases2.default.deleteMany({ date: date });
 	await _temperatures2.default.deleteMany({ date: date });
-	// const broadcastRegex = /^delete/;
-	// await Flame.deleteMany({date});
-	// await Humidity.deleteMany({date});
 };
 
 var getCurrentDate = exports.getCurrentDate = function getCurrentDate(_) {
@@ -141,4 +140,10 @@ var getCurrentTime = exports.getCurrentTime = function getCurrentTime(_) {
 	var min = currentTime.getMinutes();
 
 	return (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+};
+
+var getAvgValue = exports.getAvgValue = function getAvgValue(doc, valueNode) {
+	return doc.reduce(function (acc, curr) {
+		return acc + +curr[valueNode];
+	}, 0) / doc.length;
 };

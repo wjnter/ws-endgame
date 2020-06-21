@@ -1,26 +1,64 @@
-import Flame from "../models/flames.model";
-import Humidity from "../models/humidities.model";
 import Gas from "../models/gases.model";
 import Temperature from "../models/temperatures.model";
 import AvgGases from "../models/avgGases.model";
 import AvgTemperatures from "../models/avgTemperatures.model";
 
-const handleGetType = async ({ typeName, type, value, date, time }) => {
-	const docsType = new typeName({ type, value, date, time });
+const handleGetType = async ({
+	typeName,
+	type,
+	valueNode1,
+	valueNode2,
+	date,
+	time,
+}) => {
+	const docsType = new typeName({ type, valueNode1, valueNode2, date, time });
 	await docsType.save();
 };
 
-export const createDoc = async ({ type, value, date, time }) => {
+export const createDoc = async ({
+	type,
+	valueNode1,
+	valueNode2,
+	date,
+	time,
+}) => {
 	const getTypes = {
-		// "flame": () =>  handleGetType({typeName: Flame, type, value, date, time}),
-		// "humidity": () => handleGetType({typeName: Humidity, type, value, date, time}),
-		gas: () => handleGetType({ typeName: Gas, type, value, date, time }),
+		gas: () =>
+			handleGetType({
+				typeName: Gas,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
 		temperature: () =>
-			handleGetType({ typeName: Temperature, type, value, date, time }),
+			handleGetType({
+				typeName: Temperature,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
 		avgGas: () =>
-			handleGetType({ typeName: AvgGases, type, value, date, time }),
+			handleGetType({
+				typeName: AvgGases,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
 		avgTemperature: () =>
-			handleGetType({ typeName: AvgTemperatures, type, value, date, time }),
+			handleGetType({
+				typeName: AvgTemperatures,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
 	};
 	getTypes[type]();
 };
@@ -43,18 +81,6 @@ export const CONSTANT_TYPE = [
 	{ type: "avgGas", model: AvgGases },
 ];
 
-// export const CONSTANT_TYPE_AVG = [
-// 	{ type: "avgTemperature", model: AvgTemperatures },
-// 	{ type: "avgGas", model: AvgGases },
-// ];
-
-// export const CONSTANT_TYPE = [
-//   { type: "flame",       model: Flame },
-//   { type: "gas",         model: Gas },
-//   { type: "humidity",    model: Humidity },
-//   { type: "temperature", model: Temperature }
-// ];
-
 export function IsJsonString(str) {
 	try {
 		JSON.parse(str);
@@ -64,23 +90,14 @@ export function IsJsonString(str) {
 	return true;
 }
 
-export const clearAllDocs = async (message) => {
-	// const broadcastRegex = /^delete/;
-	if (message.includes("delete")) {
-		const date = "May 30 2020";
-		await Gas.deleteMany({ date });
-		await Temperature.deleteMany({ date });
-		// await Flame.deleteMany({date});
-		// await Humidity.deleteMany({date});
-	}
+export const clearAllDocs = async (date) => {
+	await Gas.deleteMany({ date });
+	await Temperature.deleteMany({ date });
 };
 
 export const clearAllDocsWithDate = async (date) => {
 	await Gas.deleteMany({ date });
 	await Temperature.deleteMany({ date });
-	// const broadcastRegex = /^delete/;
-	// await Flame.deleteMany({date});
-	// await Humidity.deleteMany({date});
 };
 
 export const getCurrentDate = (_) => {
@@ -113,3 +130,6 @@ export const getCurrentTime = (_) => {
 
 	return `${hour < 10 ? "0" + hour : hour}:${min < 10 ? "0" + min : min}`;
 };
+
+export const getAvgValue = (doc, valueNode) =>
+	doc.reduce((acc, curr) => acc + +curr[valueNode], 0) / doc.length;

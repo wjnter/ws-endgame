@@ -21,14 +21,15 @@ import {
 	getCurrentTime,
 	clearAllDocsWithDate,
 	getAllDocs,
+	getAvgValue,
 } from "./utils";
 
 const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-// const uri = "mongodb://localhost/end-game";
+// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
 mongoose
@@ -63,7 +64,7 @@ wss.on("connection", async (ws, req) => {
 	// RegExp time to query docs
 	const regExpTime = new RegExp(timeNow, "i");
 
-	// use for..of bcuz map or forEach cannot do async
+	// use for..of, since map or forEach cannot do async
 	for (const item of CONSTANT_TYPE) {
 		const { type, model } = item;
 		// Get all docs at current time within a min
@@ -76,7 +77,7 @@ wss.on("connection", async (ws, req) => {
 	// Send the last document to the client that has been connected
 	ws.send(JSON.stringify(dataset));
 
-	/******* when server receives messsage from client trigger function with argument message *****/
+	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async (message) => {
 		// Get current hour and min to generate regexp to query
 		let avgDailyDataset = [];
@@ -93,16 +94,17 @@ wss.on("connection", async (ws, req) => {
 				if (!type.includes("avgTemperature") && !type.includes("avgGas")) {
 					doc = await getDocsWithDate(currentFullDate, model);
 					if (doc.length) {
-						const { type, value, date, time } = doc[1];
-						let newAvgDocs = { type, value, date, time };
+						const { type, valueNode1, valueNode2, date, time } = doc[1];
+						let newAvgDocs = { type, valueNode1, valueNode2, date, time };
 						// Compute the average value to create new docs
-						const avgValue =
-							doc.reduce((acc, curr) => acc + +curr.value, 0) / doc.length;
+						const avgValueNode1 = getAvgValue(doc, "valueNode1");
+						const avgValueNode2 = getAvgValue(doc, "valueNode2");
+						newAvgDocs.valueNode1 = "" + Math.round(avgValueNode1);
+						newAvgDocs.valueNode2 = "" + Math.round(avgValueNode2);
 						newAvgDocs.type =
 							"avg" +
 							newAvgDocs.type[0].toUpperCase() +
 							newAvgDocs.type.slice(1);
-						newAvgDocs.value = "" + Math.round(avgValue);
 						dataOfPreviousDate.push(newAvgDocs);
 					}
 				}
@@ -130,7 +132,7 @@ wss.on("connection", async (ws, req) => {
 					avgDailyDataset.push(...avgDoc);
 				}
 			}
-			ws.send(JSON.stringify(["getAvgData", avgDailyDataset]));
+			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
 		}
 

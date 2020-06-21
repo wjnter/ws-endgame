@@ -20,19 +20,15 @@ var bodyParser = require("body-parser");
 var express = require("express"); //express framework to have a higher level of methods
 var app = express(); //assign app variable the express class/method
 var http = require("http");
-var path = require("path");
-var jwt = require("jsonwebtoken");
 var mongoose = require("mongoose");
 
-var _require = require("awake-heroku"),
-    AwakeHeroku = _require.AwakeHeroku;
+var userName = "tptdong97";
+var password = "admin";
+var dbName = "endgame_ute";
 
-// const uri =
-// 	"mongodb+srv://tptdong97:admin@endgame-hcmute-qyhzy.mongodb.net/endgame_ute?retryWrites=true&w=majority";
+// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 var uri = "mongodb://localhost/end-game";
 var port = process.env.PORT || 3300;
-
-AwakeHeroku.add({ url: "https://ute-endgame.herokuapp.com/" });
 
 mongoose.connect(process.env.MONGODB_URI || uri).catch(function (err) {
 	return console.log("err here::::", err);
@@ -57,15 +53,8 @@ app.get("/", function (req, res) {
 	res.send("hello");
 });
 
-// when browser sends get request, send html file to browser
-// viewed at http://localhost:3300
-// app.get("/", (req, res) => {
-// 	res.sendFile(path.join(__dirname + "/index.html"));
-// });
-
 /*-------------------------------ws chat server----------------------------------*/
 
-//app.ws('/echo', function(ws, req) {
 wss.on("connection", async function (ws, req) {
 	var dataset = [];
 	var timeNow = (0, _utils.getCurrentTime)();
@@ -73,7 +62,7 @@ wss.on("connection", async function (ws, req) {
 	// RegExp time to query docs
 	var regExpTime = new RegExp(timeNow, "i");
 
-	// use for..of bcuz map or forEach cannot do async
+	// use for..of, since map or forEach cannot do async
 	var _iteratorNormalCompletion = true;
 	var _didIteratorError = false;
 	var _iteratorError = undefined;
@@ -109,7 +98,7 @@ wss.on("connection", async function (ws, req) {
 
 	ws.send(JSON.stringify(dataset));
 
-	/******* when server receives messsage from client trigger function with argument message *****/
+	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async function (message) {
 		// Get current hour and min to generate regexp to query
 		var avgDailyDataset = [];
@@ -136,17 +125,18 @@ wss.on("connection", async function (ws, req) {
 						if (doc.length) {
 							var _doc$ = doc[1],
 							    _type = _doc$.type,
-							    value = _doc$.value,
+							    valueNode1 = _doc$.valueNode1,
+							    valueNode2 = _doc$.valueNode2,
 							    date = _doc$.date,
 							    time = _doc$.time;
 
-							var newAvgDocs = { type: _type, value: value, date: date, time: time };
+							var newAvgDocs = { type: _type, valueNode1: valueNode1, valueNode2: valueNode2, date: date, time: time };
 							// Compute the average value to create new docs
-							var avgValue = doc.reduce(function (acc, curr) {
-								return acc + +curr.value;
-							}, 0) / doc.length;
+							var avgValueNode1 = (0, _utils.getAvgValue)(doc, "valueNode1");
+							var avgValueNode2 = (0, _utils.getAvgValue)(doc, "valueNode2");
+							newAvgDocs.valueNode1 = "" + Math.round(avgValueNode1);
+							newAvgDocs.valueNode2 = "" + Math.round(avgValueNode2);
 							newAvgDocs.type = "avg" + newAvgDocs.type[0].toUpperCase() + newAvgDocs.type.slice(1);
-							newAvgDocs.value = "" + Math.round(avgValue);
 							dataOfPreviousDate.push(newAvgDocs);
 						}
 					}
@@ -209,7 +199,7 @@ wss.on("connection", async function (ws, req) {
 				}
 			}
 
-			ws.send(JSON.stringify(["getAvgData", avgDailyDataset]));
+			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
 		}
 
