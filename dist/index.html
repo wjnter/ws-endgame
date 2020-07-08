@@ -68,12 +68,12 @@
 			const randomData = () => {
 				const randomValueGas = Math.floor(Math.random() * 5 + 20);
 				const randomValueTemperature = Math.floor(Math.random() * 15 + 20);
-				const date = new Date().toString().split(" ");
-				const currentDate = date.slice(1, 4).join(" ");
-				const currentTime = date[4];
+				const randomValueBattery = Math.floor(Math.random() * 15 + 20);
 				return `[
-					{"type": "gas", "valueNode1": "${randomValueGas}", "valueNode2": "${randomValueGas}", "date": "${currentDate}", "time": "${currentTime}"},
-					{"type": "temperature", "valueNode1": "${randomValueTemperature}", "valueNode2": "${randomValueTemperature}", "date": "${currentDate}", "time": "${currentTime}"}
+					{"type": "gas", "valueNode1": "${randomValueGas}", "valueNode2": "${randomValueGas}"},
+					{"type": "temperature", "valueNode1": "${randomValueTemperature}", "valueNode2": "${randomValueTemperature}"},
+					{"type": "battery", "valueNode1": "${randomValueBattery}", "valueNode2": "${randomValueBattery}"},
+					{"type": "timbersaw", "valueNode1": "${0}", "valueNode2": "${0}"}
 				]`;
 			};
 

@@ -2,6 +2,8 @@ import Gas from "../models/gases.model";
 import Temperature from "../models/temperatures.model";
 import AvgGases from "../models/avgGases.model";
 import AvgTemperatures from "../models/avgTemperatures.model";
+import Timbersaw from "../models/timbersaw.model";
+import Battery from "../models/battery.model";
 
 const handleGetType = async ({
 	typeName,
@@ -35,6 +37,24 @@ export const createDoc = async ({
 		temperature: () =>
 			handleGetType({
 				typeName: Temperature,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
+		battery: () =>
+			handleGetType({
+				typeName: Battery,
+				type,
+				valueNode1,
+				valueNode2,
+				date,
+				time,
+			}),
+		timbersaw: () =>
+			handleGetType({
+				typeName: Timbersaw,
 				type,
 				valueNode1,
 				valueNode2,
@@ -77,6 +97,8 @@ export const getAllDocs = async (model) => await model.find({});
 export const CONSTANT_TYPE = [
 	{ type: "temperature", model: Temperature },
 	{ type: "gas", model: Gas },
+	{ type: "timbersaw", model: Timbersaw },
+	{ type: "battery", model: Battery },
 	{ type: "avgTemperature", model: AvgTemperatures },
 	{ type: "avgGas", model: AvgGases },
 ];
@@ -90,46 +112,23 @@ export function IsJsonString(str) {
 	return true;
 }
 
-export const clearAllDocs = async (date) => {
-	await Gas.deleteMany({ date });
-	await Temperature.deleteMany({ date });
-};
-
 export const clearAllDocsWithDate = async (date) => {
 	await Gas.deleteMany({ date });
 	await Temperature.deleteMany({ date });
+	await Battery.deleteMany({ date });
+	await Timbersaw.deleteMany({ date });
 };
 
-export const getCurrentDate = (_) => {
-	const fullDate = new Date();
-	const CONSTANT_MONTH = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec",
-	];
-	const year = fullDate.getFullYear();
-	const month = fullDate.getMonth();
-	const date = fullDate.getDate();
-
-	return `${CONSTANT_MONTH[month]} ${date} ${year}`;
-};
-
-export const getCurrentTime = (_) => {
-	const currentTime = new Date();
-	const hour = currentTime.getHours();
-	const min = currentTime.getMinutes();
-
-	return `${hour < 10 ? "0" + hour : hour}:${min < 10 ? "0" + min : min}`;
-};
+export const getCurrentTimeAndDate = (identifier) => {
+	const date = new Date().toString().split(" ");
+	const currentDate = date.slice(1, 4).join(" ");
+	const currentTime = date[4];
+	const arrTime = currentTime.split(":");
+	const currentTimeWithHourAndMin = `${arrTime[0]}:${arrTime[1]}`;
+	if (identifier === "date") return currentDate;
+	if (identifier === "wholeTime") return currentTime;
+	if (identifier === "hourAndMin") return currentTimeWithHourAndMin;
+}
 
 export const getAvgValue = (doc, valueNode) =>
 	doc.reduce((acc, curr) => acc + +curr[valueNode], 0) / doc.length;

@@ -26,8 +26,8 @@ var userName = "tptdong97";
 var password = "admin";
 var dbName = "endgame_ute";
 
-// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-var uri = "mongodb://localhost/end-game";
+var uri = "mongodb+srv://" + userName + ":" + password + "@endgame-ute-3eiy7.mongodb.net/" + dbName + "?retryWrites=true&w=majority";
+// const uri = "mongodb://localhost/end-game";
 var port = process.env.PORT || 3300;
 
 mongoose.connect(process.env.MONGODB_URI || uri).catch(function (err) {
@@ -52,15 +52,17 @@ var wss = new WebSocketServer({ server: server });
 app.get("/", function (req, res) {
 	res.send("hello");
 });
-
 /*-------------------------------ws chat server----------------------------------*/
 
 wss.on("connection", async function (ws, req) {
 	var dataset = [];
-	var timeNow = (0, _utils.getCurrentTime)();
+	// const currentFullDate = "May 31 2020";
 	var currentFullDate = "";
+	// let currentFullDate = "Jul 08 2020";
 	// RegExp time to query docs
-	var regExpTime = new RegExp(timeNow, "i");
+	var currentTimeWithHourAndMin = (0, _utils.getCurrentTimeAndDate)("hourAndMin");
+	// currentTimeWithHourAndMin: ---  /14:15/i
+	var regExpTime = new RegExp(currentTimeWithHourAndMin, "i");
 
 	// use for..of, since map or forEach cannot do async
 	var _iteratorNormalCompletion = true;
@@ -100,12 +102,15 @@ wss.on("connection", async function (ws, req) {
 
 	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async function (message) {
-		// Get current hour and min to generate regexp to query
 		var avgDailyDataset = [];
-		// const fullDateNow = "May 31 2020";
-		var fullDateNow = (0, _utils.getCurrentDate)();
-		var isNewDate = currentFullDate !== fullDateNow;
-
+		var newMessage = "";
+		var currentDate = (0, _utils.getCurrentTimeAndDate)("date");
+		var currentTime = (0, _utils.getCurrentTimeAndDate)("wholeTime");
+		// const currentDate = "May 31 2020";
+		// const isNewDate = currentFullDate !== "Jul 09 2020";
+		var isNewDate = currentFullDate !== currentDate;
+		console.log("isNewDate: ", isNewDate);
+		console.log("currentFullDate: ", currentFullDate);
 		if (isNewDate && currentFullDate !== "") {
 			var dataOfPreviousDate = [];
 			var _iteratorNormalCompletion2 = true;
@@ -161,12 +166,22 @@ wss.on("connection", async function (ws, req) {
 			// Clear all docs of the previous day
 			await (0, _utils.clearAllDocsWithDate)(currentFullDate);
 
-			currentFullDate = fullDateNow;
+			currentFullDate = currentDate;
 		}
+		if (isNewDate) currentFullDate = currentDate;
+
+		console.log("currentFullDate: ", currentFullDate);
 
 		var isJson = (0, _utils.IsJsonString)(message);
+		if (isJson) {
+			var objMessage = JSON.parse(message);
+			objMessage.forEach(function (obj) {
+				obj.date = currentDate;obj.time = currentTime;
+			});
+			newMessage = JSON.stringify(objMessage);
+		}
 
-		isJson ? (0, _utils.createDocs)(message, _utils.createDoc) : await (0, _utils.clearAllDocs)(message);
+		isJson ? (0, _utils.createDocs)(newMessage, _utils.createDoc) : await (0, _utils.clearAllDocsWithDate)(message);
 
 		if (message === "getAvgData") {
 			var _iteratorNormalCompletion3 = true;
@@ -206,7 +221,7 @@ wss.on("connection", async function (ws, req) {
 		// console.log("Received: " + message);
 		wss.clients.forEach(function (client) {
 			// Send all clients including sender.
-			client.readyState && isJson && client.send(message);
+			client.readyState && isJson && client.send(newMessage);
 		});
 	});
 	ws.on("close", function () {

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getAvgValue = exports.getCurrentTime = exports.getCurrentDate = exports.clearAllDocsWithDate = exports.clearAllDocs = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
+exports.getAvgValue = exports.getCurrentTimeAndDate = exports.clearAllDocsWithDate = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
 exports.IsJsonString = IsJsonString;
 
 var _gases = require("../models/gases.model");
@@ -21,6 +21,14 @@ var _avgGases2 = _interopRequireDefault(_avgGases);
 var _avgTemperatures = require("../models/avgTemperatures.model");
 
 var _avgTemperatures2 = _interopRequireDefault(_avgTemperatures);
+
+var _timbersaw = require("../models/timbersaw.model");
+
+var _timbersaw2 = _interopRequireDefault(_timbersaw);
+
+var _battery = require("../models/battery.model");
+
+var _battery2 = _interopRequireDefault(_battery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -57,6 +65,26 @@ var createDoc = exports.createDoc = async function createDoc(_ref2) {
 		temperature: function temperature() {
 			return handleGetType({
 				typeName: _temperatures2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
+		},
+		battery: function battery() {
+			return handleGetType({
+				typeName: _battery2.default,
+				type: type,
+				valueNode1: valueNode1,
+				valueNode2: valueNode2,
+				date: date,
+				time: time
+			});
+		},
+		timbersaw: function timbersaw() {
+			return handleGetType({
+				typeName: _timbersaw2.default,
 				type: type,
 				valueNode1: valueNode1,
 				valueNode2: valueNode2,
@@ -103,7 +131,7 @@ var getAllDocs = exports.getAllDocs = async function getAllDocs(model) {
 	return await model.find({});
 };
 
-var CONSTANT_TYPE = exports.CONSTANT_TYPE = [{ type: "temperature", model: _temperatures2.default }, { type: "gas", model: _gases2.default }, { type: "avgTemperature", model: _avgTemperatures2.default }, { type: "avgGas", model: _avgGases2.default }];
+var CONSTANT_TYPE = exports.CONSTANT_TYPE = [{ type: "temperature", model: _temperatures2.default }, { type: "gas", model: _gases2.default }, { type: "timbersaw", model: _timbersaw2.default }, { type: "battery", model: _battery2.default }, { type: "avgTemperature", model: _avgTemperatures2.default }, { type: "avgGas", model: _avgGases2.default }];
 
 function IsJsonString(str) {
 	try {
@@ -114,32 +142,22 @@ function IsJsonString(str) {
 	return true;
 }
 
-var clearAllDocs = exports.clearAllDocs = async function clearAllDocs(date) {
-	await _gases2.default.deleteMany({ date: date });
-	await _temperatures2.default.deleteMany({ date: date });
-};
-
 var clearAllDocsWithDate = exports.clearAllDocsWithDate = async function clearAllDocsWithDate(date) {
 	await _gases2.default.deleteMany({ date: date });
 	await _temperatures2.default.deleteMany({ date: date });
+	await _battery2.default.deleteMany({ date: date });
+	await _timbersaw2.default.deleteMany({ date: date });
 };
 
-var getCurrentDate = exports.getCurrentDate = function getCurrentDate(_) {
-	var fullDate = new Date();
-	var CONSTANT_MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-	var year = fullDate.getFullYear();
-	var month = fullDate.getMonth();
-	var date = fullDate.getDate();
-
-	return CONSTANT_MONTH[month] + " " + date + " " + year;
-};
-
-var getCurrentTime = exports.getCurrentTime = function getCurrentTime(_) {
-	var currentTime = new Date();
-	var hour = currentTime.getHours();
-	var min = currentTime.getMinutes();
-
-	return (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+var getCurrentTimeAndDate = exports.getCurrentTimeAndDate = function getCurrentTimeAndDate(identifier) {
+	var date = new Date().toString().split(" ");
+	var currentDate = date.slice(1, 4).join(" ");
+	var currentTime = date[4];
+	var arrTime = currentTime.split(":");
+	var currentTimeWithHourAndMin = arrTime[0] + ":" + arrTime[1];
+	if (identifier === "date") return currentDate;
+	if (identifier === "wholeTime") return currentTime;
+	if (identifier === "hourAndMin") return currentTimeWithHourAndMin;
 };
 
 var getAvgValue = exports.getAvgValue = function getAvgValue(doc, valueNode) {

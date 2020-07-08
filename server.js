@@ -13,15 +13,13 @@ import {
 	createDocs,
 	createDoc,
 	IsJsonString,
-	clearAllDocs,
 	getDocsWithDate,
 	getDocsWithTime,
 	CONSTANT_TYPE,
-	getCurrentDate,
-	getCurrentTime,
 	clearAllDocsWithDate,
 	getAllDocs,
 	getAvgValue,
+	getCurrentTimeAndDate
 } from "./utils";
 
 const userName = "tptdong97";
@@ -54,15 +52,17 @@ const wss = new WebSocketServer({ server });
 app.get("/", (req, res) => {
 	res.send("hello");
 });
-
 /*-------------------------------ws chat server----------------------------------*/
 
 wss.on("connection", async (ws, req) => {
 	const dataset = [];
-	const timeNow = getCurrentTime();
+	// const currentFullDate = "May 31 2020";
 	let currentFullDate = "";
+	// let currentFullDate = "Jul 08 2020";
 	// RegExp time to query docs
-	const regExpTime = new RegExp(timeNow, "i");
+	const currentTimeWithHourAndMin = getCurrentTimeAndDate("hourAndMin");
+	// currentTimeWithHourAndMin: ---  /14:15/i
+	const regExpTime = new RegExp(currentTimeWithHourAndMin, "i");
 
 	// use for..of, since map or forEach cannot do async
 	for (const item of CONSTANT_TYPE) {
@@ -79,12 +79,15 @@ wss.on("connection", async (ws, req) => {
 
 	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async (message) => {
-		// Get current hour and min to generate regexp to query
 		let avgDailyDataset = [];
-		// const fullDateNow = "May 31 2020";
-		const fullDateNow = getCurrentDate();
-		const isNewDate = currentFullDate !== fullDateNow;
-
+		let newMessage = "";
+		const currentDate = getCurrentTimeAndDate("date");
+		const currentTime = getCurrentTimeAndDate("wholeTime");
+		// const currentDate = "May 31 2020";
+		// const isNewDate = currentFullDate !== "Jul 09 2020";
+		const isNewDate = currentFullDate !== currentDate;
+		console.log("isNewDate: ", isNewDate);
+		console.log("currentFullDate: ", currentFullDate);
 		if (isNewDate && currentFullDate !== "") {
 			let dataOfPreviousDate = [];
 			for (const item of CONSTANT_TYPE) {
@@ -114,12 +117,20 @@ wss.on("connection", async (ws, req) => {
 			// Clear all docs of the previous day
 			await clearAllDocsWithDate(currentFullDate);
 
-			currentFullDate = fullDateNow;
+			currentFullDate = currentDate;
 		}
+		if (isNewDate) currentFullDate = currentDate;
+		
+		console.log("currentFullDate: ", currentFullDate);
 
 		const isJson = IsJsonString(message);
+		if (isJson) {
+			const objMessage = JSON.parse(message);
+			objMessage.forEach(obj => {obj.date = currentDate; obj.time = currentTime});
+			newMessage = JSON.stringify(objMessage);
+		}
 
-		isJson ? createDocs(message, createDoc) : await clearAllDocs(message);
+		isJson ? createDocs(newMessage, createDoc) : await clearAllDocsWithDate(message);
 
 		if (message === "getAvgData") {
 			for (const item of CONSTANT_TYPE) {
@@ -139,7 +150,7 @@ wss.on("connection", async (ws, req) => {
 		// console.log("Received: " + message);
 		wss.clients.forEach((client) => {
 			// Send all clients including sender.
-			client.readyState && isJson && client.send(message);
+			client.readyState && isJson && client.send(newMessage);
 		});
 	});
 	ws.on("close", () => {
