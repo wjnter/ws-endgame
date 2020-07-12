@@ -4,6 +4,7 @@ import AvgGases from "../models/avgGases.model";
 import AvgTemperatures from "../models/avgTemperatures.model";
 import Timbersaw from "../models/timbersaw.model";
 import Battery from "../models/battery.model";
+const fetch = require("node-fetch");
 
 const handleGetType = async ({
 	typeName,
@@ -128,7 +129,28 @@ export const getCurrentTimeAndDate = (identifier) => {
 	if (identifier === "date") return currentDate;
 	if (identifier === "wholeTime") return currentTime;
 	if (identifier === "hourAndMin") return currentTimeWithHourAndMin;
-}
+};
 
 export const getAvgValue = (doc, valueNode) =>
 	doc.reduce((acc, curr) => acc + +curr[valueNode], 0) / doc.length;
+
+// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
+export async function sendPushNotification(expoPushToken) {
+	const message = {
+		to: expoPushToken,
+		sound: "default",
+		title: "Original Title",
+		body: "And here is the body!",
+		data: { data: "goes here" },
+	};
+
+	await fetch("https://exp.host/--/api/v2/push/send", {
+		method: "POST",
+		headers: {
+			Accept: "application/json",
+			"Accept-encoding": "gzip, deflate",
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(message),
+	});
+}

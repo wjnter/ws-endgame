@@ -19,7 +19,8 @@ import {
 	clearAllDocsWithDate,
 	getAllDocs,
 	getAvgValue,
-	getCurrentTimeAndDate
+	getCurrentTimeAndDate,
+	sendPushNotification,
 } from "./utils";
 
 const userName = "tptdong97";
@@ -58,7 +59,7 @@ wss.on("connection", async (ws, req) => {
 	const dataset = [];
 	// const currentFullDate = "May 31 2020";
 	let currentFullDate = "";
-	// let currentFullDate = "Jul 08 2020";
+	// let currentFullDate = "Jul 10 2020";
 	// RegExp time to query docs
 	const currentTimeWithHourAndMin = getCurrentTimeAndDate("hourAndMin");
 	// currentTimeWithHourAndMin: ---  /14:15/i
@@ -86,8 +87,6 @@ wss.on("connection", async (ws, req) => {
 		// const currentDate = "May 31 2020";
 		// const isNewDate = currentFullDate !== "Jul 09 2020";
 		const isNewDate = currentFullDate !== currentDate;
-		console.log("isNewDate: ", isNewDate);
-		console.log("currentFullDate: ", currentFullDate);
 		if (isNewDate && currentFullDate !== "") {
 			let dataOfPreviousDate = [];
 			for (const item of CONSTANT_TYPE) {
@@ -120,17 +119,20 @@ wss.on("connection", async (ws, req) => {
 			currentFullDate = currentDate;
 		}
 		if (isNewDate) currentFullDate = currentDate;
-		
-		console.log("currentFullDate: ", currentFullDate);
 
 		const isJson = IsJsonString(message);
 		if (isJson) {
 			const objMessage = JSON.parse(message);
-			objMessage.forEach(obj => {obj.date = currentDate; obj.time = currentTime});
+			objMessage.forEach((obj) => {
+				obj.date = currentDate;
+				obj.time = currentTime;
+			});
 			newMessage = JSON.stringify(objMessage);
 		}
 
-		isJson ? createDocs(newMessage, createDoc) : await clearAllDocsWithDate(message);
+		isJson
+			? createDocs(newMessage, createDoc)
+			: await clearAllDocsWithDate(message);
 
 		if (message === "getAvgData") {
 			for (const item of CONSTANT_TYPE) {
@@ -145,6 +147,10 @@ wss.on("connection", async (ws, req) => {
 			}
 			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
+		}
+		if (message === "push") {
+			//token of my iphone
+			await sendPushNotification("ExponentPushToken[pug8SfIShcNnZF9kKpocfV]");
 		}
 
 		// console.log("Received: " + message);

@@ -57,8 +57,8 @@ app.get("/", function (req, res) {
 wss.on("connection", async function (ws, req) {
 	var dataset = [];
 	// const currentFullDate = "May 31 2020";
-	var currentFullDate = "";
-	// let currentFullDate = "Jul 08 2020";
+	// let currentFullDate = "";
+	var currentFullDate = "Jul 10 2020";
 	// RegExp time to query docs
 	var currentTimeWithHourAndMin = (0, _utils.getCurrentTimeAndDate)("hourAndMin");
 	// currentTimeWithHourAndMin: ---  /14:15/i
@@ -109,8 +109,6 @@ wss.on("connection", async function (ws, req) {
 		// const currentDate = "May 31 2020";
 		// const isNewDate = currentFullDate !== "Jul 09 2020";
 		var isNewDate = currentFullDate !== currentDate;
-		console.log("isNewDate: ", isNewDate);
-		console.log("currentFullDate: ", currentFullDate);
 		if (isNewDate && currentFullDate !== "") {
 			var dataOfPreviousDate = [];
 			var _iteratorNormalCompletion2 = true;
@@ -170,13 +168,12 @@ wss.on("connection", async function (ws, req) {
 		}
 		if (isNewDate) currentFullDate = currentDate;
 
-		console.log("currentFullDate: ", currentFullDate);
-
 		var isJson = (0, _utils.IsJsonString)(message);
 		if (isJson) {
 			var objMessage = JSON.parse(message);
 			objMessage.forEach(function (obj) {
-				obj.date = currentDate;obj.time = currentTime;
+				obj.date = currentDate;
+				obj.time = currentTime;
 			});
 			newMessage = JSON.stringify(objMessage);
 		}
@@ -216,6 +213,10 @@ wss.on("connection", async function (ws, req) {
 
 			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
+		}
+		if (message === "push") {
+			//token of my iphone
+			await (0, _utils.sendPushNotification)("ExponentPushToken[pug8SfIShcNnZF9kKpocfV]");
 		}
 
 		// console.log("Received: " + message);

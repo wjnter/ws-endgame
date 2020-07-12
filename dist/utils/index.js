@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getAvgValue = exports.getCurrentTimeAndDate = exports.clearAllDocsWithDate = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
 exports.IsJsonString = IsJsonString;
+exports.sendPushNotification = sendPushNotification;
 
 var _gases = require("../models/gases.model");
 
@@ -31,6 +32,8 @@ var _battery = require("../models/battery.model");
 var _battery2 = _interopRequireDefault(_battery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var fetch = require("node-fetch");
 
 var handleGetType = async function handleGetType(_ref) {
 	var typeName = _ref.typeName,
@@ -165,3 +168,24 @@ var getAvgValue = exports.getAvgValue = function getAvgValue(doc, valueNode) {
 		return acc + +curr[valueNode];
 	}, 0) / doc.length;
 };
+
+// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
+async function sendPushNotification(expoPushToken) {
+	var message = {
+		to: expoPushToken,
+		sound: "default",
+		title: "Original Title",
+		body: "And here is the body!",
+		data: { data: "goes here" }
+	};
+
+	await fetch("https://exp.host/--/api/v2/push/send", {
+		method: "POST",
+		headers: {
+			Accept: "application/json",
+			"Accept-encoding": "gzip, deflate",
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify(message)
+	});
+}

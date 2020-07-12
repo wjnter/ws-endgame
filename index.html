@@ -69,11 +69,12 @@
 				const randomValueGas = Math.floor(Math.random() * 5 + 20);
 				const randomValueTemperature = Math.floor(Math.random() * 15 + 20);
 				const randomValueBattery = Math.floor(Math.random() * 15 + 20);
+				const randomValueTimbersaw = Math.round(Math.random());
 				return `[
 					{"type": "gas", "valueNode1": "${randomValueGas}", "valueNode2": "${randomValueGas}"},
 					{"type": "temperature", "valueNode1": "${randomValueTemperature}", "valueNode2": "${randomValueTemperature}"},
 					{"type": "battery", "valueNode1": "${randomValueBattery}", "valueNode2": "${randomValueBattery}"},
-					{"type": "timbersaw", "valueNode1": "${0}", "valueNode2": "${0}"}
+					{"type": "timbersaw", "valueNode1": "${randomValueTimbersaw}", "valueNode2": "${randomValueTimbersaw}"}
 				]`;
 			};
 
