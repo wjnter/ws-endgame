@@ -26,8 +26,8 @@ var userName = "tptdong97";
 var password = "admin";
 var dbName = "endgame_ute";
 
-var uri = "mongodb+srv://" + userName + ":" + password + "@endgame-ute-3eiy7.mongodb.net/" + dbName + "?retryWrites=true&w=majority";
-// const uri = "mongodb://localhost/end-game";
+// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+var uri = "mongodb://localhost/end-game";
 var port = process.env.PORT || 3300;
 
 mongoose.connect(process.env.MONGODB_URI || uri).catch(function (err) {
@@ -57,8 +57,8 @@ app.get("/", function (req, res) {
 wss.on("connection", async function (ws, req) {
 	var dataset = [];
 	// const currentFullDate = "May 31 2020";
-	// let currentFullDate = "";
-	var currentFullDate = "Jul 10 2020";
+	var currentFullDate = "";
+	// let currentFullDate = "Jul 10 2020";
 	// RegExp time to query docs
 	var currentTimeWithHourAndMin = (0, _utils.getCurrentTimeAndDate)("hourAndMin");
 	// currentTimeWithHourAndMin: ---  /14:15/i
@@ -214,9 +214,9 @@ wss.on("connection", async function (ws, req) {
 			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
 		}
-		if (message === "push") {
+		if (message === "burn" || message === "saw") {
 			//token of my iphone
-			await (0, _utils.sendPushNotification)("ExponentPushToken[pug8SfIShcNnZF9kKpocfV]");
+			await (0, _utils.sendPushNotification)(message, "ExponentPushToken[pug8SfIShcNnZF9kKpocfV]");
 		}
 
 		// console.log("Received: " + message);

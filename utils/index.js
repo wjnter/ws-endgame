@@ -135,13 +135,22 @@ export const getAvgValue = (doc, valueNode) =>
 	doc.reduce((acc, curr) => acc + +curr[valueNode], 0) / doc.length;
 
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
-export async function sendPushNotification(expoPushToken) {
+export async function sendPushNotification(type, expoPushToken) {
 	const message = {
-		to: expoPushToken,
-		sound: "default",
-		title: "Original Title",
-		body: "And here is the body!",
-		data: { data: "goes here" },
+		burn: {
+			to: expoPushToken,
+			sound: "default",
+			title: "Danger!! Fire",
+			body: "Fire detected!!",
+			data: { data: "goes here" },
+		},
+		saw: {
+			to: expoPushToken,
+			sound: "default",
+			title: "Danger!! Timber Saw",
+			body: "Timber saw detected",
+			data: { data: "goes here" },
+		},
 	};
 
 	await fetch("https://exp.host/--/api/v2/push/send", {
@@ -151,6 +160,6 @@ export async function sendPushNotification(expoPushToken) {
 			"Accept-encoding": "gzip, deflate",
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify(message),
+		body: JSON.stringify(message[type]),
 	});
 }

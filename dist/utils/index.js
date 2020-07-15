@@ -170,22 +170,37 @@ var getAvgValue = exports.getAvgValue = function getAvgValue(doc, valueNode) {
 };
 
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
-async function sendPushNotification(expoPushToken) {
+async function sendPushNotification(type, expoPushToken) {
 	var message = {
-		to: expoPushToken,
-		sound: "default",
-		title: "Original Title",
-		body: "And here is the body!",
-		data: { data: "goes here" }
-	};
+		burn: {
+			to: expoPushToken,
+			sound: "default",
+			title: "Danger!! Fire",
+			body: "Fire detected!!",
+			data: { data: "goes here" }
+		},
+		saw: {
+			to: expoPushToken,
+			sound: "default",
+			title: "Danger!! Timber Saw",
+			body: "Timber saw detected",
+			data: { data: "goes here" }
+		}
+		// const message = {
+		// 	to: expoPushToken,
+		// 	sound: "default",
+		// 	title: "Original Title",
+		// 	body: "And here is the body!",
+		// 	data: { data: "goes here" },
+		// };
 
-	await fetch("https://exp.host/--/api/v2/push/send", {
+	};await fetch("https://exp.host/--/api/v2/push/send", {
 		method: "POST",
 		headers: {
 			Accept: "application/json",
 			"Accept-encoding": "gzip, deflate",
 			"Content-Type": "application/json"
 		},
-		body: JSON.stringify(message)
+		body: JSON.stringify(message[type])
 	});
 }

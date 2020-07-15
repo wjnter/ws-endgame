@@ -27,8 +27,8 @@ const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-// const uri = "mongodb://localhost/end-game";
+// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
 mongoose
@@ -148,9 +148,12 @@ wss.on("connection", async (ws, req) => {
 			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
 		}
-		if (message === "push") {
+		if (message === "burn" || message === "saw") {
 			//token of my iphone
-			await sendPushNotification("ExponentPushToken[pug8SfIShcNnZF9kKpocfV]");
+			await sendPushNotification(
+				message,
+				"ExponentPushToken[pug8SfIShcNnZF9kKpocfV]"
+			);
 		}
 
 		// console.log("Received: " + message);
