@@ -27,8 +27,8 @@ const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-const uri = "mongodb://localhost/end-game";
+const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+// const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
 mongoose
