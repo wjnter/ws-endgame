@@ -80,6 +80,7 @@ wss.on("connection", async (ws, req) => {
 
 	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async (message) => {
+		console.log("data received: ", message);
 		let avgDailyDataset = [];
 		let newMessage = "";
 		const currentDate = getCurrentTimeAndDate("date");
