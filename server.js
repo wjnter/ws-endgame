@@ -126,7 +126,10 @@ wss.on("connection", async (ws, req) => {
 			const objMessage = JSON.parse(message);
 			// Set interval for nodes
 			if (objMessage[0] === "interval") {
-				ws.send(message);
+				wss.clients.forEach((client) => {
+					// Send all clients including sender.
+					client.readyState && isJson && client.send(message);
+				});
 			} else {
 				// set time to store
 				objMessage.forEach((obj) => {
