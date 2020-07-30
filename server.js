@@ -27,8 +27,8 @@ const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-// const uri = "mongodb://localhost/end-game";
+// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
 mongoose
@@ -124,16 +124,21 @@ wss.on("connection", async (ws, req) => {
 		const isJson = IsJsonString(message);
 		if (isJson) {
 			const objMessage = JSON.parse(message);
-			objMessage.forEach((obj) => {
-				obj.date = currentDate;
-				obj.time = currentTime;
-			});
-			newMessage = JSON.stringify(objMessage);
+			// Set interval for nodes
+			if (objMessage[0] === "interval") {
+				ws.send(message);
+			} else {
+				// set time to store
+				objMessage.forEach((obj) => {
+					obj.date = currentDate;
+					obj.time = currentTime;
+				});
+				newMessage = JSON.stringify(objMessage);
+				createDocs(newMessage, createDoc);
+			}
+		} else {
+			await clearAllDocsWithDate(message);
 		}
-
-		isJson
-			? createDocs(newMessage, createDoc)
-			: await clearAllDocsWithDate(message);
 
 		if (message === "getAvgData") {
 			for (const item of CONSTANT_TYPE) {
