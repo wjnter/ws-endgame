@@ -134,21 +134,39 @@ export const getCurrentTimeAndDate = (identifier) => {
 export const getAvgValue = (doc, valueNode) =>
 	doc.reduce((acc, curr) => acc + +curr[valueNode], 0) / doc.length;
 
+const tokenNotification = "ExponentPushToken[pug8SfIShcNnZF9kKpocfV]";
+
+export const FUNCTION_ALERT = {
+	timbersaw: async (value1, value2) => {
+		value1 && (await sendPushNotification("saw", "1", tokenNotification));
+		value2 && (await sendPushNotification("saw", "2", tokenNotification));
+	},
+	gas: async (value1, value2) => {
+		value1 > 15 && (await sendPushNotification("burn", "1", tokenNotification));
+		value2 > 15 && (await sendPushNotification("burn", "2", tokenNotification));
+	},
+	temperature: async (value1, value2) => {
+		value1 > 50 && (await sendPushNotification("burn", "1", tokenNotification));
+		value2 > 50 && (await sendPushNotification("burn", "2", tokenNotification));
+	},
+	battery: (value1, value2) => console.log("sad"),
+};
+
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
-export async function sendPushNotification(type, expoPushToken) {
+export async function sendPushNotification(type, node, expoPushToken) {
 	const message = {
 		burn: {
 			to: expoPushToken,
 			sound: "default",
-			title: "Danger!! Fire",
-			body: "Fire detected!!",
+			title: `Nguy hiểm! Cháy tại Trạm ${node}`,
+			body: "Đang phát hiện nhiệt độ bất thường!!",
 			data: { data: "goes here" },
 		},
 		saw: {
 			to: expoPushToken,
 			sound: "default",
-			title: "Danger!! Timber Saw",
-			body: "Timber saw detected",
+			title: `Nguy hiểm! Trộm gỗ tại Trạm ${node}`,
+			body: "Đang phát hiện hiện tượng trộm gỗ",
 			data: { data: "goes here" },
 		},
 	};

@@ -21,6 +21,7 @@ import {
 	getAvgValue,
 	getCurrentTimeAndDate,
 	sendPushNotification,
+	FUNCTION_ALERT,
 } from "./utils";
 
 const userName = "tptdong97";
@@ -123,6 +124,7 @@ wss.on("connection", async (ws, req) => {
 
 		const isJson = IsJsonString(message);
 		if (isJson) {
+			// type of objMessage is Array
 			const objMessage = JSON.parse(message);
 			// Set interval for nodes
 			if (objMessage[0] === "interval") {
@@ -131,6 +133,10 @@ wss.on("connection", async (ws, req) => {
 					client.readyState && isJson && client.send(message);
 				});
 			} else {
+				// Check danger value for pushing notification
+				for (const { type, valueNode1, valueNode2 } of objMessage) {
+					await FUNCTION_ALERT[type](valueNode1, valueNode2);
+				}
 				// set time to store
 				objMessage.forEach((obj) => {
 					obj.date = currentDate;

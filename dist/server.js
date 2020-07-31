@@ -171,24 +171,64 @@ wss.on("connection", async function (ws, req) {
 
 		var isJson = (0, _utils.IsJsonString)(message);
 		if (isJson) {
+			// type of objMessage is Array
 			var objMessage = JSON.parse(message);
-			objMessage.forEach(function (obj) {
-				obj.date = currentDate;
-				obj.time = currentTime;
-			});
-			newMessage = JSON.stringify(objMessage);
+			// Set interval for nodes
+			if (objMessage[0] === "interval") {
+				wss.clients.forEach(function (client) {
+					// Send all clients including sender.
+					client.readyState && isJson && client.send(message);
+				});
+			} else {
+				// Check danger value for pushing notification
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
+
+				try {
+					for (var _iterator3 = objMessage[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var _step3$value = _step3.value,
+						    type = _step3$value.type,
+						    _valueNode = _step3$value.valueNode1,
+						    _valueNode2 = _step3$value.valueNode2;
+
+						await _utils.FUNCTION_ALERT[type](_valueNode, _valueNode2);
+					}
+					// set time to store
+				} catch (err) {
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
+						}
+					} finally {
+						if (_didIteratorError3) {
+							throw _iteratorError3;
+						}
+					}
+				}
+
+				objMessage.forEach(function (obj) {
+					obj.date = currentDate;
+					obj.time = currentTime;
+				});
+				newMessage = JSON.stringify(objMessage);
+				(0, _utils.createDocs)(newMessage, _utils.createDoc);
+			}
+		} else {
+			await (0, _utils.clearAllDocsWithDate)(message);
 		}
 
-		isJson ? (0, _utils.createDocs)(newMessage, _utils.createDoc) : await (0, _utils.clearAllDocsWithDate)(message);
-
 		if (message === "getAvgData") {
-			var _iteratorNormalCompletion3 = true;
-			var _didIteratorError3 = false;
-			var _iteratorError3 = undefined;
+			var _iteratorNormalCompletion4 = true;
+			var _didIteratorError4 = false;
+			var _iteratorError4 = undefined;
 
 			try {
-				for (var _iterator3 = _utils.CONSTANT_TYPE[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-					var _item = _step3.value;
+				for (var _iterator4 = _utils.CONSTANT_TYPE[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					var _item = _step4.value;
 					var type = _item.type,
 					    model = _item.model;
 
@@ -198,16 +238,16 @@ wss.on("connection", async function (ws, req) {
 					}
 				}
 			} catch (err) {
-				_didIteratorError3 = true;
-				_iteratorError3 = err;
+				_didIteratorError4 = true;
+				_iteratorError4 = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion3 && _iterator3.return) {
-						_iterator3.return();
+					if (!_iteratorNormalCompletion4 && _iterator4.return) {
+						_iterator4.return();
 					}
 				} finally {
-					if (_didIteratorError3) {
-						throw _iteratorError3;
+					if (_didIteratorError4) {
+						throw _iteratorError4;
 					}
 				}
 			}

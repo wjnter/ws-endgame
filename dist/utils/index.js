@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.getAvgValue = exports.getCurrentTimeAndDate = exports.clearAllDocsWithDate = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
+exports.FUNCTION_ALERT = exports.getAvgValue = exports.getCurrentTimeAndDate = exports.clearAllDocsWithDate = exports.CONSTANT_TYPE = exports.getAllDocs = exports.getDocsWithTime = exports.getDocsWithDate = exports.createDocs = exports.createDoc = undefined;
 exports.IsJsonString = IsJsonString;
 exports.sendPushNotification = sendPushNotification;
 
@@ -169,21 +169,41 @@ var getAvgValue = exports.getAvgValue = function getAvgValue(doc, valueNode) {
 	}, 0) / doc.length;
 };
 
+var tokenNotification = "ExponentPushToken[pug8SfIShcNnZF9kKpocfV]";
+
+var FUNCTION_ALERT = exports.FUNCTION_ALERT = {
+	timbersaw: async function timbersaw(value1, value2) {
+		value1 && (await sendPushNotification("saw", "1", tokenNotification));
+		value2 && (await sendPushNotification("saw", "2", tokenNotification));
+	},
+	gas: async function gas(value1, value2) {
+		value1 > 15 && (await sendPushNotification("burn", "1", tokenNotification));
+		value2 > 15 && (await sendPushNotification("burn", "2", tokenNotification));
+	},
+	temperature: async function temperature(value1, value2) {
+		value1 > 50 && (await sendPushNotification("burn", "1", tokenNotification));
+		value2 > 50 && (await sendPushNotification("burn", "2", tokenNotification));
+	},
+	battery: function battery(value1, value2) {
+		return console.log("sad");
+	}
+};
+
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
-async function sendPushNotification(type, expoPushToken) {
+async function sendPushNotification(type, node, expoPushToken) {
 	var message = {
 		burn: {
 			to: expoPushToken,
 			sound: "default",
-			title: "Danger!! Fire",
-			body: "Fire detected!!",
+			title: "Nguy hi\u1EC3m! Ch\xE1y t\u1EA1i Tr\u1EA1m " + node,
+			body: "Đang phát hiện nhiệt độ bất thường!!",
 			data: { data: "goes here" }
 		},
 		saw: {
 			to: expoPushToken,
 			sound: "default",
-			title: "Danger!! Timber Saw",
-			body: "Timber saw detected",
+			title: "Nguy hi\u1EC3m! Tr\u1ED9m g\u1ED7 t\u1EA1i Tr\u1EA1m " + node,
+			body: "Đang phát hiện hiện tượng trộm gỗ",
 			data: { data: "goes here" }
 		}
 	};

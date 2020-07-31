@@ -32,8 +32,8 @@
 		></div>
 
 		<script>
-			var sock = new WebSocket("ws://45.119.83.67:3300/");
-			// var sock = new WebSocket("ws://localhost:3300/");
+			// var sock = new WebSocket("ws://45.119.83.67:3300/");
+			var sock = new WebSocket("ws://localhost:3300/");
 			// var sock = new WebSocket("ws://ute-endgame.herokuapp.com"); //replace this address with the one the node.js server prints out. keep port 3000
 			var display = document.getElementById("display");
 			let idInterval = 0;
@@ -71,10 +71,18 @@
 				const randomValueBattery = Math.floor(Math.random() * 15 + 20);
 				const randomValueTimbersaw = Math.round(Math.random());
 				return `[
-					{"type": "gas", "valueNode1": "${randomValueGas}", "valueNode2": "${randomValueGas}"},
-					{"type": "temperature", "valueNode1": "${randomValueTemperature}", "valueNode2": "${randomValueTemperature}"},
-					{"type": "battery", "valueNode1": "${randomValueBattery}", "valueNode2": "${randomValueBattery}"},
-					{"type": "timbersaw", "valueNode1": "${randomValueTimbersaw}", "valueNode2": "${randomValueTimbersaw}"}
+					{"type": "gas", "valueNode1": "${randomValueGas}", "valueNode2": "${
+					randomValueGas + 2
+				}"},
+					{"type": "temperature", "valueNode1": "${randomValueTemperature}", "valueNode2": "${
+					randomValueTemperature + 2
+				}"},
+					{"type": "battery", "valueNode1": "${randomValueBattery}", "valueNode2": "${
+					randomValueBattery + 2
+				}"},
+					{"type": "timbersaw", "valueNode1": "${randomValueTimbersaw}", "valueNode2": "${
+					randomValueTimbersaw ? 0 : 1
+				}"}
 				]`;
 			};
 
@@ -82,7 +90,7 @@
 				idInterval = setInterval(() => {
 					const data = randomData();
 					sock.send(data); //send string to server
-				}, 3000);
+				}, 5000);
 			}
 			function stopSending() {
 				clearInterval(idInterval);
