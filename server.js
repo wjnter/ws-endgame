@@ -28,7 +28,7 @@ const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${userName}:${password}@cluster0-krug7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 // const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
@@ -78,6 +78,10 @@ wss.on("connection", async (ws, req) => {
 
 	// Send the last document to the client that has been connected
 	ws.send(JSON.stringify(dataset));
+
+	ws.on("open", function open() {
+		console.log("client connected");
+	});
 
 	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async (message) => {
