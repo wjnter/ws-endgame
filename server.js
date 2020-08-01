@@ -134,7 +134,7 @@ wss.on("connection", async (ws, req) => {
 			if (objMessage[0] === "interval") {
 				wss.clients.forEach((client) => {
 					// Send all clients including sender.
-					client.readyState && isJson && client.send(message);
+					client.readyState && client.send(message);
 				});
 			} else {
 				// Check danger value for pushing notification

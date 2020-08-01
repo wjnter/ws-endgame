@@ -26,8 +26,8 @@ var userName = "tptdong97";
 var password = "admin";
 var dbName = "endgame_ute";
 
-// const uri = `mongodb+srv://${userName}:${password}@endgame-ute-3eiy7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-var uri = "mongodb://localhost/end-game";
+var uri = "mongodb+srv://" + userName + ":" + password + "@cluster0-krug7.mongodb.net/" + dbName + "?retryWrites=true&w=majority";
+// const uri = "mongodb://localhost/end-game";
 var port = process.env.PORT || 3300;
 
 mongoose.connect(process.env.MONGODB_URI || uri).catch(function (err) {
@@ -99,6 +99,10 @@ wss.on("connection", async function (ws, req) {
 	}
 
 	ws.send(JSON.stringify(dataset));
+
+	ws.on("open", function open() {
+		console.log("client connected");
+	});
 
 	/******* when server receives message from client trigger function with argument message *****/
 	ws.on("message", async function (message) {
