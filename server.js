@@ -133,6 +133,7 @@ wss.on("connection", async (ws, req) => {
 			// Set interval for nodes
 			if (objMessage[0] === "interval") {
 				wss.clients.forEach((client) => {
+					console.log("send all..");
 					// Send all clients including sender.
 					client.readyState && client.send(message);
 				});
