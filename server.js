@@ -28,8 +28,8 @@ const userName = "tptdong97";
 const password = "admin";
 const dbName = "endgame_ute";
 
-const uri = `mongodb+srv://${userName}:${password}@cluster0-krug7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-// const uri = "mongodb://localhost/end-game";
+// const uri = `mongodb+srv://${userName}:${password}@cluster0-krug7.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+const uri = "mongodb://localhost/end-game";
 const port = process.env.PORT || 3300;
 
 mongoose
@@ -132,11 +132,7 @@ wss.on("connection", async (ws, req) => {
 			const objMessage = JSON.parse(message);
 			// Set interval for nodes
 			if (objMessage[0] === "interval") {
-				wss.clients.forEach((client) => {
-					console.log("send all..");
-					// Send all clients including sender.
-					client.readyState && client.send(message);
-				});
+				console.log("ok la");
 			} else {
 				// Check danger value for pushing notification
 				for (const { type, valueNode1, valueNode2 } of objMessage) {
@@ -176,11 +172,18 @@ wss.on("connection", async (ws, req) => {
 			);
 		}
 
-		// console.log("Received: " + message);
-		wss.clients.forEach((client) => {
-			// Send all clients including sender.
-			client.readyState && isJson && client.send(newMessage);
-		});
+		if (JSON.parse(message)[0] === "interval") {
+			wss.clients.forEach((client) => {
+				// Send all clients including sender.
+				client.readyState && isJson && client.send(message);
+			});
+		} else {
+			// console.log("Received: " + message);
+			wss.clients.forEach((client) => {
+				// Send all clients including sender.
+				client.readyState && isJson && client.send(newMessage);
+			});
+		}
 	});
 	ws.on("close", () => {
 		console.log("lost one client");
