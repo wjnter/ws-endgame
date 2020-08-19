@@ -163,16 +163,7 @@ wss.on("connection", async (ws, req) => {
 			}
 			ws.send(JSON.stringify([message, avgDailyDataset]));
 			avgDailyDataset.length = 0;
-		}
-		if (message === "burn" || message === "saw") {
-			//token of my iphone
-			await sendPushNotification(
-				message,
-				"ExponentPushToken[pug8SfIShcNnZF9kKpocfV]"
-			);
-		}
-
-		if (JSON.parse(message)[0] === "interval") {
+		} else if (message.includes("interval")) {
 			wss.clients.forEach((client) => {
 				// Send all clients including sender.
 				client.readyState && isJson && client.send(message);
