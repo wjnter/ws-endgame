@@ -138,8 +138,10 @@ const tokenNotification = "ExponentPushToken[pug8SfIShcNnZF9kKpocfV]";
 
 export const FUNCTION_ALERT = {
 	timbersaw: async (value1, value2) => {
-		value1 && (await sendPushNotification("saw", "1", tokenNotification));
-		value2 && (await sendPushNotification("saw", "2", tokenNotification));
+		value1 === "1" &&
+			(await sendPushNotification("saw", "1", tokenNotification));
+		value2 === "1" &&
+			(await sendPushNotification("saw", "2", tokenNotification));
 	},
 	gas: async (value1, value2) => {
 		value1 > 25 && (await sendPushNotification("burn", "1", tokenNotification));
