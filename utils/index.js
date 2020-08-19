@@ -142,8 +142,8 @@ export const FUNCTION_ALERT = {
 		value2 && (await sendPushNotification("saw", "2", tokenNotification));
 	},
 	gas: async (value1, value2) => {
-		value1 > 15 && (await sendPushNotification("burn", "1", tokenNotification));
-		value2 > 15 && (await sendPushNotification("burn", "2", tokenNotification));
+		value1 > 25 && (await sendPushNotification("burn", "1", tokenNotification));
+		value2 > 25 && (await sendPushNotification("burn", "2", tokenNotification));
 	},
 	temperature: async (value1, value2) => {
 		value1 > 50 && (await sendPushNotification("burn", "1", tokenNotification));
